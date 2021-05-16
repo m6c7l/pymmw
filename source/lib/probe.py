@@ -7,7 +7,9 @@
 # usb and xds110 debugger support
 #
 
-import sys, time, array
+import sys
+import time
+import array
 
 from lib.utility import *
 from lib.shell import *
@@ -78,13 +80,13 @@ def serial_discover(vid=VID, pid=PID, sid=None):
 
 # ------------------------------------------------
 
-def xds_reset(dev, delay=50):
+def xds_reset(dev, delay=100):
     #_ = {0:'CDC Communication',
     #     1:'CDC Data', 2:'Vendor Specific', 3:'CDC Communication',
     #     4:'CDC Data', 5:'Human Interface Device', 6:'Vendor Specific'}
     ep = usb_point(dev, 2, 2)
     if ep is None: return False
-    for v in ('00', '01'):
+    for v in ('00', '01') * 2:
         ep.write(hex2dec('{} {} {} {}'.format('2a', '02', '00', '0e {}'.format(v))))
         time.sleep(delay / 1000)
     return True

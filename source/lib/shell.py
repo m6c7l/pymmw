@@ -7,7 +7,10 @@
 # shell and ipc
 #
 
-import os, time, sys, subprocess
+import os
+import time
+import sys
+import subprocess
 
 from lib.helper import *
 

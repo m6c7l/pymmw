@@ -7,7 +7,8 @@
 # Doppler-range FFT heat map - 2D plot
 #
 
-import os, sys
+import os
+import sys
 
 try:
     
@@ -140,7 +141,7 @@ if __name__ == "__main__":
 
         fig.canvas.mpl_connect('button_press_event', onclick)
         
-        start_plot(fig, ax, update, 5)
+        start_plot(fig, ax, update, 4)
     
     except Exception as e:
         print(e, file=sys.stderr, flush=True)

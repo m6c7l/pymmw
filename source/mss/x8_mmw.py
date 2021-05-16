@@ -8,7 +8,10 @@
 # TI IWR1843 ES1.0 @ mmWave SDK demo of SDK 3.4.0.3
 #
 
-import sys, json, serial, threading
+import sys
+import json
+import serial
+import threading
 
 from lib.shell import *
 from lib.helper import *

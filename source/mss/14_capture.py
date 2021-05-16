@@ -7,7 +7,11 @@
 # TI IWR1443 ES2.0 EVM @ capture demo of SDK 1.1.0.2
 #
 
-import os, time, sys, threading, serial
+import os
+import time
+import sys
+import threading
+import serial
 
 from lib.probe import *
 from lib.shell import *

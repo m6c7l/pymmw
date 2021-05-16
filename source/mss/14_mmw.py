@@ -8,7 +8,10 @@
 # TI IWR1443 ES3.0 EVM @ mmWave SDK demo of SDK 2.1.0.4
 #
 
-import sys, json, serial, threading
+import sys
+import json
+import serial
+import threading
 
 from lib.shell import *
 from lib.helper import *
@@ -26,9 +29,9 @@ _meta_ = {
     'aux': 921600,
     'ant': (4, 3),
     'app': {
-        'rangeProfile':        ('plot_range_profile', 'capture_range_profile'),
+        'rangeProfile':        ('plot_range_profile', 'capture_range_profile', 'monitor_activity', ),
         'noiseProfile':        ('plot_range_profile', ), 
-        'detectedObjects':     ('plot_detected_objects', 'simple_cfar_clustering'),
+        'detectedObjects':     ('plot_detected_objects', 'simple_cfar_clustering', ),
         'rangeAzimuthHeatMap': ('plot_range_azimuth_heat_map', ),
         'rangeDopplerHeatMap': ('plot_range_doppler_heat_map', )
     }
@@ -69,6 +72,10 @@ def _conf_(cfg):
     if '_comment_' in c:
         c.pop('_comment_', None)  # remove entry        
     
+    if '_apps_' in c:
+        _meta_['app'] = c['_apps_']
+        c.pop('_apps_', None)  # remove entry
+
     if '_settings_' in c:
         
         rx_ant = int(c['_settings_']['rxAntennas'])

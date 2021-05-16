@@ -7,7 +7,10 @@
 # DFT of IF signal plot (per frame, from memory dump of Capture Demo)
 #
 
-import os, sys, threading, time
+import os
+import sys
+import threading
+import time
 
 try:
        

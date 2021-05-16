@@ -7,7 +7,10 @@
 # capture support
 #
 
-import sys, threading, json, queue
+import sys
+import threading
+import json
+import queue
 
 # ------------------------------------------------
 

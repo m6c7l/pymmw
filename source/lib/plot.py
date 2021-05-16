@@ -7,13 +7,16 @@
 # plot support
 #
 
-import sys, time, threading, json, queue
+import sys
+import time
+import threading
+import json
+import queue
 
 import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
 from mpl_toolkits.mplot3d import art3d
 
 # ------------------------------------------------
@@ -23,12 +26,11 @@ class Line(art3d.Line3D):  # a line in 3D space
     def __init__(self, from_xyz=(0, 0, 0), to_xyz=(1, 1, 1), *args, **kwargs):
         xs, ys, zs = tuple(zip(from_xyz, to_xyz))
         art3d.Line3D.__init__(self, xs, ys, zs, *args, **kwargs)
+        
 
     def location(self, from_, to_, *args):
         xs, ys, zs = tuple(zip(from_, to_))
-        self.set_xdata(xs)
-        self.set_ydata(ys)
-        self.set_3d_properties(zs)
+        self.set_data_3d(xs, ys, zs)
 
 
 class Point(Line):  # a point (a very short line) in 3D space
@@ -43,6 +45,7 @@ class Point(Line):  # a point (a very short line) in 3D space
             tt = threading.Thread(target=self.__fadeout, args=(0.1 * vanish, 0.1))
             tt.daemon = True
             tt.start()
+
      
     def __fadeout(self, period, delta):
         
@@ -58,10 +61,16 @@ class Point(Line):  # a point (a very short line) in 3D space
         while True:
             time.sleep(next(tick))
             na = self.get_alpha() - delta
-            if na <= 0:
+            if not self.get_visible():
+                _ = self.axes
                 self.remove()
+                self.axes = _
                 break
-            self.set_alpha(na)
+            if na > 0:
+                self.set_alpha(na)
+            else:
+                self.set_visible(False)
+
 
     def location(self, at_, *args):
         Line.location(self, at_, at_)
@@ -87,13 +96,14 @@ def set_aspect_equal_3d(ax):  # axis have to be equal
 
 def move_figure(fig, xy):
     backend = mpl.get_backend()
-    if backend == 'TkAgg':
+    if   backend.lower().startswith('tk'):
         fig.canvas.manager.window.wm_geometry("+%d+%d" % xy)
-    elif backend == 'WXAgg':
+    elif backend.lower().startswith('wx'):
         fig.canvas.manager.window.SetPosition(xy)
-    else:  # QT and GTK
+    elif backend.lower().startswith('qt') or \
+         backend.lower().startswith('gtk'):
         fig.canvas.manager.window.move(*xy)
-    
+
 # ------------------------------------------------
 
 def update_data(fig, q):
@@ -135,7 +145,7 @@ def update_plot(fig, q, func, fps):
             q.alive = False
 
 
-def start_plot(fig, ax, func, fps=1):
+def start_plot(fig, ax, func, fps):
     
     fig.canvas.draw()
     

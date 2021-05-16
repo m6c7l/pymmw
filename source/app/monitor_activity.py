@@ -4,12 +4,13 @@
 #
 
 #
-# range and noise profile - capture
+# monitor activity (max dB value diff signal to noise per range bin)
 #
 
 import os
 import sys
 import time
+import math
 
 try:
 
@@ -25,10 +26,14 @@ except ImportError as e:
 
 # ------------------------------------------------
 
+RANGE_BIN = 1.0  # meters
+
+# ------------------------------------------------
+
 def update(data):
-
+    
     if 'range_profile' not in data: return
-
+    
     r = data['range_profile']
 
     if 'noise_profile' in data:
@@ -41,29 +46,22 @@ def update(data):
         bin = range_max / len(r)
         x = [i*bin for i in range(len(r))]
         x = [v - range_bias for v in x]
-
-        o = None
-        if 'detected_points' in data:
-            o = [0] * len(x)
-            for p in data['detected_points']:
-                ri, _ = (int(v) for v in p.split(','))
-                if ri < len(o):
-                    o[ri] += 1
- 
-        if 'header' in data:
-            
-            if 'time' not in data['header']: return
-            if 'number' not in data['header']: return
-
-            clk, cnt = data['header']['time'], data['header']['number']
- 
-            if o is None: o = [0] * len(x)
-            
-            for i in range(1, len(x)):
-                s = '{} {:.3f} {:.3f} {:.3f} {}'.format(i, x[i], r[i], n[i], o[i])
-                if i == 1: s += ' {} {} {:.3f}'.format(cnt, clk, time.time())
-                fh.write(s + '\n')
-                fh.flush()
+        
+        segm = [[]]
+        for i in range(1, len(x)):
+            if x[i] < RANGE_BIN * len(segm):
+                segm[-1].append(r[i] - n[i])  # mathematically not correct (dB values), but ok for this purpose
+            else:
+                segm.append([])
+        
+        segm.pop()
+        
+        try:
+            s = ('{:.3f}' + ' {}' * len(segm)).format(time.time(), *[max(0, int(round(max(seg)))) for seg in segm])
+            fh.write(s + '\n')
+            fh.flush()
+        except:
+            pass
 
         os.fsync(fh.fileno())
 
@@ -87,7 +85,7 @@ if __name__ == "__main__":
                  
         if not os.path.exists(fp): os.makedirs(fp)
         utc = time.strftime('%Y%m%e-%H%M%S', time.gmtime())
-        fh = open('{}/{}_{}.log'.format(fp, this_name, utc), 'w')        
+        fh = open('{}/{}-{}.log'.format(fp, this_name, utc), 'w')        
 
         start_capture(update)
         

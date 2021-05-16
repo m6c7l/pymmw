@@ -7,7 +7,8 @@
 # range and noise profile - 2D plot
 #
 
-import os, sys
+import os
+import sys
 
 try:
 
@@ -50,6 +51,7 @@ def update(data, history=5):
         x = [i*bin for i in range(len(y))]
         x = [v - range_bias for v in x]
         ax.plot(x, y, color='blue', linewidth=0.75)
+        ax.axhline(y=np.mean(y), color='blue', linestyle='--', linewidth=0.75)
  
         if 'detected_points' in data:        
             a = {}
@@ -72,7 +74,8 @@ def update(data, history=5):
             x = [i*bin for i in range(len(y))]
             x = [v - range_bias for v in x if type(v)]
         ax.plot(x, y, color='green', linewidth=0.75)
-                        
+        ax.axhline(y=np.mean(y), color='green', linestyle='--', linewidth=0.75)
+    
 # ------------------------------------------------
 
 if __name__ == "__main__":

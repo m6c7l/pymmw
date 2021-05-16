@@ -11,7 +11,16 @@
 # goto pymmw 
 #
 
-import os, sys, glob, serial, threading, json, argparse, signal, platform, time
+import os
+import sys
+import glob
+import serial
+import threading
+import json
+import argparse
+import signal
+import platform
+import time
 
 from lib.shell import *
 from lib.probe import *
@@ -21,7 +30,7 @@ from lib.probe import *
 def _init_(data, fw):
     global mss
     if len(data) > 0 and mss is None: 
-        for item in fw:            
+        for item in fw:
             mss = __import__(item, fromlist=('',))
             if len(mss._read_(data, open(os.devnull, "w"))) > 1:
                 return True
@@ -31,11 +40,14 @@ def _init_(data, fw):
 
 def _read_(prt, dat, timeout=2, handle=None):  # observe control port and call handler when firmware is recognized
 
-    fw = ['.'.join(os.path.splitext(item)[0].split(os.sep)) for item in glob.glob(os.sep.join(('mss', '*.py')))]
+    script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
     
+    fw = [os.path.splitext(item)[0].split(os.sep) for item in glob.glob(os.sep.join((script_path, 'mss', '*.py')))]
+    fw = ['.'.join(mss[-2:]) for mss in fw]
+
     cnt = 0
     ext = {}
- 
+
     try:
         
         if len(fw) == 0:
@@ -88,7 +100,7 @@ def _read_(prt, dat, timeout=2, handle=None):  # observe control port and call h
             
     except Exception as e:
         print_log(e, sys._getframe())
-        sys.exit(1)
+        os._exit(1)
             
 
 def _input_(prt):  # accept keyboard input and forward to control port
@@ -130,7 +142,7 @@ if __name__ == "__main__":
                 dev = dev[0]
                 print_log(' - '.join([dev._details_[k] for k in dev._details_]))
  
-                for rst in (False, True):
+                for rst in (False,):
                     try:
                         xds_test(dev, reset=rst)
                         break
@@ -176,4 +188,4 @@ if __name__ == "__main__":
 
     except Exception as e:         
         print_log(e, sys._getframe())
-        sys.exit(1)
+        os._exit(1)

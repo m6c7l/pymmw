@@ -7,7 +7,8 @@
 # super-simple CFAR clustering
 #
 
-import os, sys
+import os
+import sys
 
 try:
        
@@ -31,7 +32,7 @@ except ImportError as e:
 def update(data, threshold=0.1):
 
     if 'detected_points' not in data: return
-        
+
     X, Y, Z = [], [], []
 
     for _, p in data['detected_points'].items():
@@ -67,7 +68,7 @@ def update(data, threshold=0.1):
         mx, my, mz, err = np.mean(X), np.mean(Y), np.mean(Z), np.sqrt(np.std(X)**2 + np.std(Y)**2 + np.std(Z)**2)
 
         if k == 0 and err > threshold: return
- 
+
     for x, y, z in zip(X, Y, Z):     
         pt = Point((x, y, z), color=(0.5, 0.5, 0.5), size=3, marker='.')
         ax.add_artist(pt)
@@ -90,10 +91,10 @@ def update(data, threshold=0.1):
     
     xz = Point((mx, y_, mz), color=(1.0, 0.0, 0.0), size=3, marker='.')
     ax.add_artist(xz)
-
+ 
     yz = Point((x_, my, mz), color=(1.0, 0.0, 0.0), size=3, marker='.')
     ax.add_artist(yz)
-
+ 
     xy = Point((mx, my, z_), color=(1.0, 0.0, 0.0), size=3, marker='.')
     ax.add_artist(xy)                    
 

@@ -7,7 +7,8 @@
 # azimuth-range FFT heat map - 2D plot
 #
 
-import os, sys
+import os
+import sys
 
 try:
     

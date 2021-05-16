@@ -7,7 +7,8 @@
 # CFAR detected objects - 3D plot
 #
 
-import os, sys
+import os
+import sys
 
 try:
        
@@ -60,10 +61,10 @@ def update(data):
 
             xz = Point((x, y_, z), color=(0.67, 0.67, 0.67), size=1, marker='.')
             ax.add_artist(xz)
-
+ 
             yz = Point((x_, y, z), color=(0.67, 0.67, 0.67), size=1, marker='.')
             ax.add_artist(yz)
-
+ 
             xy = Point((x, y, z_), color=(0.67, 0.67, 0.67), size=1, marker='.')
             ax.add_artist(xy)                    
 
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         fig = plt.figure(figsize=(6, 6))
         ax = plt.subplot(1, 1, 1, projection='3d')  # rows, cols, idx
         ax.view_init(azim=-45, elev=15)
-        
+                
         move_figure(fig, (0 + 45*2, 0 + 45*2))
         
         fig.canvas.set_window_title('...')
@@ -98,7 +99,7 @@ if __name__ == "__main__":
         ax.set_xlim3d((-d / 2, +d / 2))
         ax.set_ylim3d((0, d))
         ax.set_zlim3d((-d / 2, +d / 2))
-        
+                
         ax.xaxis.pane.fill = False
         ax.yaxis.pane.fill = False
         ax.zaxis.pane.fill = False
@@ -124,7 +125,7 @@ if __name__ == "__main__":
         set_aspect_equal_3d(ax)
 
         mpl.colors._colors_full_map.cache.clear()  # avoid memory leak by clearing the cache
-                    
+           
         start_plot(fig, ax, update, 4)
     
     except Exception as e:
