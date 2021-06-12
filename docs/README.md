@@ -17,9 +17,11 @@ This is a toolbox composed of Python scripts to interact with TI's evaluation mo
   * mmWave SDK Demo (SDK 2.1.0.4)
   * High Accuracy 14xx (Industrial Toolbox 4.1.0)
 * IWR1843 ES1.0
-  * mmWave SDK Demo (SDK 3.4.0.3)
+  * mmWave SDK Demo (SDK 3.5.0.4)
 * IWR6843 ES2.0
-  * mmWave SDK Demo (SDK 3.4.0.3)
+  * mmWave SDK Demo (SDK 3.5.0.4)
+
+> Make sure to connect the carrier board (i.e. ICBOOST) of the antenna module used (e.g. IWR6843-ISK, -ISK-ODS, or -AOP-EVM) via FTDI to enable resets without pressing NRST. Resets via XDS110 are supported for IWR-BOOST-EVMs devices only.
 
 > Advanced frame configuration with subframes is yet not supported.
 
@@ -80,15 +82,15 @@ The configuration files are pretty much like the original TI's profiles, except 
 
 ## Dependencies
 
-The toolbox works at least under GNU/Linux and Windows 10 with Python 3.8.5 - 3.8.7 if the following dependencies are met:
+The toolbox works at least under GNU/Linux and Windows 10 with Python 3.8.5 - 3.8.9 if the following dependencies are met:
 
 * pyserial (3.4 - 3.5)
-* pyusb (1.0.2 - 1.1.0)
-* matplotlib (3.3.1 - 3.3.3)
-* numpy (1.19.1 - 1.19.4)
-* scipy (1.5.2 - 1.5.4) - is only required for the application "azimuth-range FFT heat map" of the mmWave SDK Demo
+* pyusb (1.0.2 - 1.1.1)
+* matplotlib (3.3.1 - 3.4.1)
+* numpy (1.19.1 - 1.20.2)
+* scipy (1.5.2 - 1.6.2) - is only required for the application "azimuth-range FFT heat map" of the mmWave SDK Demo
+* pyftdi (0.51.2 - 0.52.9) - is only required for carrier boards to reset via FTDI since reset via XDS110 is not reliable
 * tiflash (1.2.9) - is only required for the application "FFT of IF signals" of the Capture Demo in conjunction with Texas Instruments’s Code Composer Studio (8.3.0) scripting interface to read ADC data from the L3 memory
-* pyftdi (0.51.2 - 0.52.0) - is only required for the tool "reset via FTDI"
 * XDS Emulation Software Package (8.3.0) - is only required for working with Windows
 
 > To make the tiflash module and the "FFT of IF signals" application work properly, an environment variable named CCS_PATH should point to the Code Composer Studio directory.

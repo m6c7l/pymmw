@@ -24,6 +24,7 @@ import time
 
 from lib.shell import *
 from lib.probe import *
+from lib.carrier import *
 
 # ------------------------------------------------
 
@@ -56,6 +57,8 @@ def _read_(prt, dat, timeout=2, handle=None):  # observe control port and call h
         t = time.time()
 
         data = ''
+
+        reset = None
         
         while handle is None:
             data = prt.readline().decode('latin-1')
@@ -68,6 +71,13 @@ def _read_(prt, dat, timeout=2, handle=None):  # observe control port and call h
   
             if timeout is not None:
                 if time.time() - timeout > t:
+                    car = usb_discover(*FTDI_USB)
+                    if len(car) > 0 and not reset:
+                        reset = time.time()
+                        if not ftdi_reset(*FTDI_USB):
+                            raise Exception('carrier not supported')
+                        t = reset
+                        continue
                     raise Exception('no handler found')
 
         if mss is None:
@@ -136,7 +146,7 @@ if __name__ == "__main__":
   
         if nrst:
             try:
-                dev = usb_discover()
+                dev = usb_discover(*XDS_USB)
                 if len(dev) == 0: raise Exception('no device detected')
          
                 dev = dev[0]
@@ -149,7 +159,7 @@ if __name__ == "__main__":
                     except:
                         pass
                      
-                prts = serial_discover(sid=dev._details_['serial'])
+                prts = serial_discover(*XDS_USB, sid=dev._details_['serial'])
                 if len(prts) != 2: raise Exception('unknown device configuration detected')
          
             except:

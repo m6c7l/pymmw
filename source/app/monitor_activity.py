@@ -84,7 +84,7 @@ if __name__ == "__main__":
         this_name = this_name[len('capture '):-len('.py')]
                  
         if not os.path.exists(fp): os.makedirs(fp)
-        utc = time.strftime('%Y%m%e-%H%M%S', time.gmtime())
+        utc = time.strftime('%Y%m%d-%H%M%S', time.gmtime())
         fh = open('{}/{}-{}.log'.format(fp, this_name, utc), 'w')        
 
         start_capture(update)
