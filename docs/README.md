@@ -21,7 +21,7 @@ This is a toolbox composed of Python scripts to interact with TI's evaluation mo
 * IWR6843 ES2.0
   * mmWave SDK Demo (SDK 3.5.0.4)
 
-> Make sure to connect the carrier board (i.e. ICBOOST) of the antenna module used (e.g. IWR6843-ISK, -ISK-ODS, or -AOP-EVM) via FTDI to enable resets without pressing NRST. Resets via XDS110 are supported for IWR-BOOST-EVMs devices only.
+> Make sure to connect the carrier board (i.e. ICBOOST) of the antenna module used (e.g. IWR6843-ISKODS) via FTDI to enable resets without pressing NRST. Resets via XDS110 are supported for IWR-BOOST-EVMs devices only.
 
 > Advanced frame configuration with subframes is yet not supported.
 
