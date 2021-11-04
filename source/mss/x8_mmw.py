@@ -12,6 +12,7 @@ import sys
 import json
 import serial
 import threading
+import struct
 
 from lib.shell import *
 from lib.helper import *
@@ -21,7 +22,7 @@ from lib.utility import *
 
 _meta_ = {
     'mss': 'MMW Demo',
-    'dev': ('xWR18xx', 'xWR68xx',),
+    'dev': ('xWR18xx', 'xWR68xx', 'xWR64xx'),
     'ver': ('03.04.00.03', '03.05.00.04',),
     'cli': 'mmwDemo:/>',
     'seq': b'\x02\x01\x04\x03\x06\x05\x08\x07',
@@ -31,7 +32,7 @@ _meta_ = {
     'app': {
         'logMagRange':         ('plot_range_profile', ), # 'capture_range_profile'),
         'noiseProfile':        ('plot_range_profile', ), 
-        'detectedObjects':     (), # ('plot_detected_objects', 'simple_cfar_clustering'),
+        'detectedObjects':     ('plot_detected_objects'),#, 'simple_cfar_clustering', ),
         'rangeAzimuthHeatMap': ('plot_range_azimuth_heat_map', ),
         'rangeDopplerHeatMap': ('plot_range_doppler_heat_map', )
     }
@@ -72,6 +73,10 @@ def _conf_(cfg):
     if '_comment_' in c:
         c.pop('_comment_', None)  # remove entry        
     
+    if '_apps_' in c:
+        _meta_['app'] = c['_apps_']
+        c.pop('_apps_', None)  # remove entry
+
     if '_settings_' in c:
         
         rx_ant = int(c['_settings_']['rxAntennas'])
@@ -187,7 +192,6 @@ def _data_(prt):  # observe auxiliary port and process incoming data
             input['buffer'] += data
             
             if data[:len(_meta_['seq'])] == _meta_['seq']:  # check for magic sequence
-                               
                 if len(output) > 0:
                     plain = json.dumps(output)
                     _pipe_(plain)
@@ -242,10 +246,10 @@ def aux_buffer(input, output, head=40, indices={
     
     
     def aux_object(dat, oth, n=16):  # detected points/objects 
-        x = intify(dat[ 0: 4])
-        y = intify(dat[ 4: 8])
-        z = intify(dat[ 8:12])
-        p = intify(dat[12: n])
+        x = struct.unpack('f',dat[ 0: 4])[0]
+        y = struct.unpack('f',dat[ 4: 8])[0]
+        z = struct.unpack('f',dat[ 8:12])[0]
+        p = struct.unpack('f',dat[12: n])[0]
         if x > 32767: x -= 65536
         if y > 32767: y -= 65536
         if z > 32767: z -= 65536
@@ -340,12 +344,11 @@ def aux_buffer(input, output, head=40, indices={
     
     # 1) point cloud
     while address == 1 and len(buffer) >= 16 and values > 0:
-        buffer = buffer[16:]  # TODO
-        values -= 1
-        if values == 0: address = 0
+        n, p, x, y, z = aux_object(buffer, other)
+        progress(n, indices[address], ('{},{}'.format(1, 1), {'v': p, 'x': x, 'y': y, 'z': z}))
 
     # ----------
-   
+
     # 0b) segment
     if len(buffer) >= 8 and blocks > 0 and address == 0:
         n, address, values = aux_struct(buffer)
