@@ -13,10 +13,12 @@ import json
 import serial
 import threading
 import struct
+import time
 
 from lib.shell import *
 from lib.helper import *
 from lib.utility import *
+from lib.logger import *
 
 # ------------------------------------------------
 
@@ -43,6 +45,9 @@ _meta_ = {
 apps = {}
 
 verbose = False
+
+log = logger()
+log.init(verbose)
 
 # ------------------------------------------------
 
@@ -177,7 +182,7 @@ def _grab_(tag):
         pass    
 
 # ------------------------------------------------
-
+dataFramePrev = {}
 def _data_(prt):  # observe auxiliary port and process incoming data
     
     if not prt.timeout:
@@ -213,6 +218,10 @@ def _data_(prt):  # observe auxiliary port and process incoming data
                 while flen < len(input['buffer']):  # keep things finite
                     flen = len(input['buffer'])
                     aux_buffer(input, output)  # do processing of captured bytes
+                    if output == {}:    # filter out empty and duplicate frames from log
+                        if dataFramePrev['header']['objects'] > 0:
+                            log.log_message(dataFramePrev)
+                    dataFramePrev = output
 
         except serial.serialutil.SerialException:
             return  # leave thread
@@ -343,9 +352,12 @@ def aux_buffer(input, output, head=40, indices={
         progress(n, indices[address], q_to_db(v))
     
     # 1) point cloud
-    while address == 1 and len(buffer) >= 16 and values > 0:
-        n, p, x, y, z = aux_object(buffer, other)
-        progress(n, indices[address], ('{},{}'.format(1, 1), {'v': p, 'x': x, 'y': y, 'z': z}))
+    while address == 1 and len(buffer) >= 16 * output['header']['objects'] and values > 0:
+        
+        numPoints = output['header']['objects']
+        for i in range(numPoints):
+            n, p, x, y, z = aux_object(buffer, other)
+            progress(n, indices[address], ('{},{}'.format(i, i), {'v': p, 'x': x, 'y': y, 'z': z}))
 
     # ----------
 
