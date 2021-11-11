@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
         cursor = wgt.Cursor(ax, useblit=True, color='white', linewidth=1)
         
-        fig.canvas.set_window_title('...')
+        fig.canvas.manager.set_window_title('...')
                            
         ax.set_title('Azimuth-Range FFT Heatmap [{};{}]'.format(angle_bins, range_bins), fontsize=10)
         ax.set_xlabel('Lateral distance along [m]')

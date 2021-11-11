@@ -16,6 +16,7 @@ import threading
 from lib.shell import *
 from lib.helper import *
 from lib.utility import *
+from lib.logger import *
 
 # ------------------------------------------------
 
@@ -42,6 +43,10 @@ _meta_ = {
 apps = {}
 
 verbose = False
+
+# ------------------------------------------------
+
+log = Logger(verbose)
 
 # ------------------------------------------------
 
@@ -183,6 +188,7 @@ def _data_(prt):  # observe auxiliary port and process incoming data
         raise TypeError('no timeout for serial port provided')
 
     input, output, sync, size = {'buffer': b''}, {}, False, _meta_['blk']
+    dataFramePrev = {}
 
     while True:
         try:
@@ -213,6 +219,11 @@ def _data_(prt):  # observe auxiliary port and process incoming data
                 while flen < len(input['buffer']):  # keep things finite
                     flen = len(input['buffer'])
                     aux_buffer(input, output)  # do processing of captured bytes
+
+                    if len(output) == 0:  # filter out empty and duplicate frames from log
+                        if dataFramePrev.setdefault('header', {}).setdefault('objects', 0) > 0:
+                            log.message(dataFramePrev)
+                    dataFramePrev = output
 
         except serial.serialutil.SerialException:
             return  # leave thread

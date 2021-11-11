@@ -101,7 +101,7 @@ if __name__ == "__main__":
         
         cursor = wgt.Cursor(ax, useblit=True, color='white', linewidth=1)
         
-        fig.canvas.set_window_title('...')
+        fig.canvas.manager.set_window_title('...')
         
         ax.set_title('Doppler-Range FFT Heatmap [{};{}]'.format(range_bins, doppler_bins), fontsize=10)
         ax.set_xlabel('Longitudinal distance [m]')

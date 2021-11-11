@@ -13,7 +13,6 @@ import json
 import serial
 import threading
 import struct
-import time
 
 from lib.shell import *
 from lib.helper import *
@@ -32,9 +31,9 @@ _meta_ = {
     'aux': 921600,
     'ant': (4, 3),
     'app': {
-        'logMagRange':         ('plot_range_profile', ), # 'capture_range_profile'),
+        'logMagRange':         ('plot_range_profile', ),  # 'capture_range_profile',),
         'noiseProfile':        ('plot_range_profile', ), 
-        'detectedObjects':     ('plot_detected_objects'),#, 'simple_cfar_clustering', ),
+        'detectedObjects':     ('plot_detected_objects', ),  # 'simple_cfar_clustering',),
         'rangeAzimuthHeatMap': ('plot_range_azimuth_heat_map', ),
         'rangeDopplerHeatMap': ('plot_range_doppler_heat_map', )
     }
@@ -46,8 +45,9 @@ apps = {}
 
 verbose = False
 
-log = logger()
-log.init(verbose)
+# ------------------------------------------------
+
+log = Logger(verbose)
 
 # ------------------------------------------------
 
@@ -182,13 +182,14 @@ def _grab_(tag):
         pass    
 
 # ------------------------------------------------
-dataFramePrev = {}
+
 def _data_(prt):  # observe auxiliary port and process incoming data
     
     if not prt.timeout:
         raise TypeError('no timeout for serial port provided')
-
+   
     input, output, sync, size = {'buffer': b''}, {}, False, _meta_['blk']
+    dataFramePrev = {}
 
     while True:
         try:
@@ -218,9 +219,10 @@ def _data_(prt):  # observe auxiliary port and process incoming data
                 while flen < len(input['buffer']):  # keep things finite
                     flen = len(input['buffer'])
                     aux_buffer(input, output)  # do processing of captured bytes
-                    if output == {}:    # filter out empty and duplicate frames from log
-                        if dataFramePrev['header']['objects'] > 0:
-                            log.log_message(dataFramePrev)
+                    
+                    if len(output) == 0:    # filter out empty and duplicate frames from log
+                        if dataFramePrev.setdefault('header', {}).setdefault('objects', 0) > 0:
+                            log.message(dataFramePrev)
                     dataFramePrev = output
 
         except serial.serialutil.SerialException:
@@ -254,11 +256,15 @@ def aux_buffer(input, output, head=40, indices={
         return n, t, l // 2
     
     
-    def aux_object(dat, oth, n=16):  # detected points/objects 
-        x = struct.unpack('f',dat[ 0: 4])[0]
-        y = struct.unpack('f',dat[ 4: 8])[0]
-        z = struct.unpack('f',dat[ 8:12])[0]
-        p = struct.unpack('f',dat[12: n])[0]
+    def aux_object(dat, oth, n=16):  # detected points/objects
+        #x = struct.unpack('f',dat[ 0: 4])[0]
+        #y = struct.unpack('f',dat[ 4: 8])[0]
+        #z = struct.unpack('f',dat[ 8:12])[0]
+        #p = struct.unpack('f',dat[12: n])[0]
+        x = intify(dat[ 0: 4])
+        y = intify(dat[ 4: 8])
+        z = intify(dat[ 8:12])
+        p = intify(dat[12: n])
         if x > 32767: x -= 65536
         if y > 32767: y -= 65536
         if z > 32767: z -= 65536
@@ -353,7 +359,6 @@ def aux_buffer(input, output, head=40, indices={
     
     # 1) point cloud
     while address == 1 and len(buffer) >= 16 * output['header']['objects'] and values > 0:
-        
         numPoints = output['header']['objects']
         for i in range(numPoints):
             n, p, x, y, z = aux_object(buffer, other)
@@ -367,7 +372,6 @@ def aux_buffer(input, output, head=40, indices={
         buffer = buffer[n:]        
         blocks -= 1
         if   address in (1, 7):
-            values = output['header']['objects']
             output[indices[address]] = {}
         elif address in (2, 3, 4, 5):
             output[indices[address]] = []
@@ -380,7 +384,7 @@ def aux_buffer(input, output, head=40, indices={
         buffer = buffer[n:]
         blocks = s
         output['header'] = {'version': v, 'length': l, 'platform': d, 'number': f, 'time': t, 'objects': o, 'blocks': s, 'subframe': u}
-    
+
     # ----------
     
     input['buffer'] = buffer

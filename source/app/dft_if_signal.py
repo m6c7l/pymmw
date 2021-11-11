@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
         fig = plt.figure()
         fig.suptitle('DFT of IF signals: chirps/frame={}, samples/chirp={}'.format(n, k), fontsize='medium')
-        fig.canvas.set_window_title('...')
+        fig.canvas.manager.set_window_title('...')
         
         tu = threading.Thread(target=update_data, args=(fig, a, k, n, s, b))
         tu.daemon = True

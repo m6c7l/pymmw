@@ -102,7 +102,7 @@ if __name__ == "__main__":
         
         move_figure(fig, (0 + 45*1, 0 + 45*1))
         
-        fig.canvas.set_window_title('...')
+        fig.canvas.manager.set_window_title('...')
                            
         ax.set_title('Range Profile'.format(), fontsize=10)
         
@@ -121,8 +121,8 @@ if __name__ == "__main__":
             ax.set_xticks(range(0, int(range_max) + 5, 10))
             
         else:  # standard
-            ax.set_ylim([0, 120])
-            ax.set_yticks(range(0, 120 + 1, 10))
+            ax.set_ylim([0, 100])
+            ax.set_yticks(range(0, 100 + 1, 10))
 
         fig.tight_layout(pad=2)
         

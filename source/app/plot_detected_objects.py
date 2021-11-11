@@ -88,7 +88,7 @@ if __name__ == "__main__":
                 
         move_figure(fig, (0 + 45*2, 0 + 45*2))
         
-        fig.canvas.set_window_title('...')
+        fig.canvas.manager.set_window_title('...')
                            
         ax.set_title('CFAR Detection'.format(), fontsize=10)
         

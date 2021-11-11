@@ -134,7 +134,7 @@ def update_plot(fig, q, func, fps):
                  
         try:
             fig.canvas.draw_idle()
-            fig.canvas.set_window_title(
+            fig.canvas.manager.set_window_title(
                 'time: {} | count: {} | wait: {} | cycles: {:010} '.format(
                     '{:.3f}'.format(time.time())[-7:],
                     cnt,
